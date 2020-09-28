@@ -3,6 +3,7 @@ const audioCtx = new AudioContext();
 var filter = audioCtx.createBiquadFilter();
 filter.type = "lowpass";
 filter.frequency.value = 200;
+filter.connect(audioCtx.destination);
 
 let connected = false;
 let srcNode = null;
@@ -17,7 +18,7 @@ const actionHandler = (_request, _sender, sendResponse) => {
     }
 
     if (srcNode) {
-      srcNode.connect(filter).connect(audioCtx.destination);
+      srcNode.connect(filter);
       connected = true;
     }
   } else {
