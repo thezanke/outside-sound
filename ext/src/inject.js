@@ -8,7 +8,7 @@ filter.connect(audioCtx.destination);
 let connected = false;
 let srcNode = null;
 
-const clickHandler = () => {
+const clickHandler = (event) => {
   if (!connected) {
     if (!srcNode) {
       const myAudio = document.querySelector('audio,video');
@@ -27,14 +27,14 @@ const clickHandler = () => {
     connected = false;
   }
 
-  sendResponse({ connected });
+  event?.detail?.sendResponse({ connected });
 };
 
 const actionTarget = new EventTarget();
 actionTarget.addEventListener('clicked', clickHandler);
 
-chrome.runtime.onMessage.addListener((request) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (!request.action) return;
   const { action, ...data } = request;
-  actionTarget.dispatchEvent(new CustomEvent(request.action, { data }));
+  actionTarget.dispatchEvent(new CustomEvent(action, { detail: { data, sender, sendResponse } }));
 });
