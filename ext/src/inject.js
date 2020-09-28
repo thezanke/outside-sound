@@ -1,17 +1,17 @@
 const audioCtx = new AudioContext();
 
 const filter = audioCtx.createBiquadFilter();
-filter.type = "lowpass";
+filter.type = 'lowpass';
 filter.frequency.value = 200;
 filter.connect(audioCtx.destination);
 
 let connected = false;
 let srcNode = null;
 
-const actionHandler = (_request, _sender, sendResponse) => {
+const clickHandler = () => {
   if (!connected) {
     if (!srcNode) {
-      const myAudio = document.querySelector("audio,video");
+      const myAudio = document.querySelector('audio,video');
       if (myAudio) srcNode = audioCtx.createMediaElementSource(myAudio);
     } else {
       srcNode.disconnect(audioCtx.destination);
@@ -30,4 +30,11 @@ const actionHandler = (_request, _sender, sendResponse) => {
   sendResponse({ connected });
 };
 
-chrome.runtime.onMessage.addListener(actionHandler);
+const actionTarget = new EventTarget();
+actionTarget.addEventListener('clicked', clickHandler);
+
+chrome.runtime.onMessage.addListener((request) => {
+  if (!request.action) return;
+  const { action, ...data } = request;
+  actionTarget.dispatchEvent(new CustomEvent(request.action, { data }));
+});
