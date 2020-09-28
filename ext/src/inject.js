@@ -1,6 +1,6 @@
 const audioCtx = new AudioContext();
 
-var filter = audioCtx.createBiquadFilter();
+const filter = audioCtx.createBiquadFilter();
 filter.type = "lowpass";
 filter.frequency.value = 200;
 filter.connect(audioCtx.destination);
