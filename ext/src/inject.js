@@ -27,7 +27,7 @@ const clickHandler = (event) => {
     connected = false;
   }
 
-  event?.detail?.sendResponse({ connected });
+  event.detail.sendResponse({ connected });
 };
 
 const actionTarget = new EventTarget();
