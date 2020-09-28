@@ -12,7 +12,7 @@ const MODES = {
 chrome.browserAction.onClicked.addListener(() => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, {}, (response) => {
-      let mode = response && response.connected ? MODES.outside : MODES.inside;
+      const mode = response && response.connected ? MODES.outside : MODES.inside;
       chrome.browserAction.setIcon({ path: mode.iconPath });
       chrome.browserAction.setTitle({ title: mode.title });
     });
