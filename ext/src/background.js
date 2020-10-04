@@ -9,12 +9,22 @@ const MODES = {
   },
 };
 
+const setMode = (connected) => {
+  const mode = connected ? MODES.outside : MODES.inside;
+  chrome.browserAction.setIcon({ path: mode.iconPath });
+  chrome.browserAction.setTitle({ title: mode.title });
+};
+
 chrome.browserAction.onClicked.addListener(() => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, { action: 'clicked' }, (response) => {
-      const mode = response && response.connected ? MODES.outside : MODES.inside;
-      chrome.browserAction.setIcon({ path: mode.iconPath });
-      chrome.browserAction.setTitle({ title: mode.title });
+    chrome.tabs.sendMessage(tabs[0].id, { action: 'CLICKED' }, (response) => {
+      setMode(response && response.connected);
     });
+  });
+});
+
+chrome.tabs.onActivated.addListener(({ tabId }) => {
+  chrome.tabs.sendMessage(tabId, { action: 'STATUS_CHECK' }, (response) => {
+    setMode(response && response.connected);
   });
 });

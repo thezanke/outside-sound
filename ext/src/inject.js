@@ -1,37 +1,52 @@
-const audioCtx = new AudioContext();
-
-const filter = audioCtx.createBiquadFilter();
-filter.type = 'lowpass';
-filter.frequency.value = 200;
-filter.connect(audioCtx.destination);
-
+let audioCtx = null;
+let filter = null;
 let connected = false;
-let srcNode = null;
+let sources = null;
 
 const clickHandler = (event) => {
+  if (!audioCtx) {
+    audioCtx = new AudioContext();
+
+    filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 200;
+    filter.connect(audioCtx.destination);
+  }
+
   if (!connected) {
-    if (!srcNode) {
-      const myAudio = document.querySelector('audio,video');
-      if (myAudio) srcNode = audioCtx.createMediaElementSource(myAudio);
-    } else {
-      srcNode.disconnect(audioCtx.destination);
+    if (!sources) {
+      const elements = document.querySelectorAll('audio,video');
+      sources = [...elements].map((el) => audioCtx.createMediaElementSource(el));
     }
 
-    if (srcNode) {
+    sources.forEach((srcNode) => {
+      try {
+        srcNode.disconnect(audioCtx.destination);
+      } catch {}
+
       srcNode.connect(filter);
-      connected = true;
-    }
+    });
+
+    connected = true;
   } else {
-    srcNode.disconnect(filter);
-    srcNode.connect(audioCtx.destination);
+    sources.forEach((srcNode) => {
+      srcNode.disconnect(filter);
+      srcNode.connect(audioCtx.destination);
+    });
+
     connected = false;
   }
 
   event.detail.sendResponse({ connected });
 };
 
+const statusCheckHandler = (event) => {
+  event.detail.sendResponse({ connected });
+};
+
 const actionTarget = new EventTarget();
-actionTarget.addEventListener('clicked', clickHandler);
+actionTarget.addEventListener('CLICKED', clickHandler);
+actionTarget.addEventListener('STATUS_CHECK', statusCheckHandler);
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (!request.action) return;
