@@ -28,3 +28,9 @@ chrome.tabs.onActivated.addListener(({ tabId }) => {
     setMode(response && response.connected);
   });
 });
+
+chrome.tabs.onUpdated.addListener((tabId) => {
+  chrome.tabs.sendMessage(tabId, { action: 'STATUS_CHECK' }, (response) => {
+    setMode(response && response.connected);
+  });
+});

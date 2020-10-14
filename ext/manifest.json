@@ -1,8 +1,8 @@
 {
   "name": "Outside Sound",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "manifest_version": 2,
-  "description": "Take the edge off and step outside your sound. Applies a lowpass filter to your audio to make it sound like you have left the room.",
+  "description": "Applies a filter to currently playing audio and makes it sound like you have left the room.",
   "homepage_url": "https://alexhoward.io",
   "icons": {
     "128": "icons/icon128-outside.png"
