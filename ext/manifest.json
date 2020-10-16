@@ -1,6 +1,6 @@
 {
   "name": "Outside Sound",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "manifest_version": 2,
   "description": "Applies a filter to currently playing audio and makes it sound like you have left the room.",
   "homepage_url": "https://alexhoward.io",
