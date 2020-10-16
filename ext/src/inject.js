@@ -1,37 +1,43 @@
-let audioCtx = null;
-let filter = null;
 let connected = false;
-let sources = null;
+
+let audioCtx = null;
+let filterNode = null;
+let sourceNodes = null;
 
 const clickHandler = (event) => {
   if (!audioCtx) {
     audioCtx = new AudioContext();
 
-    filter = audioCtx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 200;
-    filter.connect(audioCtx.destination);
+    // Create a compressor node
+    var gainNode = audioCtx.createGain();
+    gainNode.gain.value = 0.65;
+
+    filterNode = audioCtx.createBiquadFilter();
+    filterNode.type = 'lowpass';
+    filterNode.frequency.value = 200;
+
+    filterNode.connect(gainNode).connect(audioCtx.destination);
   }
 
   if (!connected) {
-    if (!sources) {
+    if (!sourceNodes) {
       const elements = document.querySelectorAll('audio,video');
-      sources = [...elements].map((el) => audioCtx.createMediaElementSource(el));
+      sourceNodes = [...elements].map((el) => audioCtx.createMediaElementSource(el));
     }
 
-    sources.forEach((srcNode) => {
+    sourceNodes.forEach((sourceNode) => {
       try {
-        srcNode.disconnect(audioCtx.destination);
+        sourceNode.disconnect(audioCtx.destination);
       } catch {}
 
-      srcNode.connect(filter);
+      sourceNode.connect(filterNode);
     });
 
     connected = true;
   } else {
-    sources.forEach((srcNode) => {
-      srcNode.disconnect(filter);
-      srcNode.connect(audioCtx.destination);
+    sourceNodes.forEach((sourceNode) => {
+      sourceNode.disconnect(filterNode);
+      sourceNode.connect(audioCtx.destination);
     });
 
     connected = false;
